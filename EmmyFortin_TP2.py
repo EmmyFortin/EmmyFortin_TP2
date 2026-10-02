@@ -14,10 +14,11 @@ from PySide6.QtWidgets import (
     QPushButton,
     QLabel,
     QLineEdit,
+    QCheckBox
 )
 
 
-# 1 Création de l'interface du Outliner Organiser
+#----------------------------------------- 1 Création de l'interface du Outliner Organiser
 
 # Class MainWindow qui va contenir l'interface de l'outil
 
@@ -28,14 +29,51 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         self.setWindowTitle("Outliner Organiser")
+        self.resize(300, 100)
 
-        # Appelle la fonction qui créer l'
+        # Appelle la fonction qui créer l'interface
         self.create_ui()
 
     def create_ui(self):
 
         # Création des widgets de l'interface utilisateur
         print("UI called")
+
+        # Création du Widget parent de la main window
+        widget = QWidget()
+
+        # Création du layout vertical
+        # Donne le layout au widget parent
+        layout = QVBoxLayout(widget)
+
+        # layout pour champ et label uniquement
+        layout_json_path = QVBoxLayout()
+
+        # Création du label du champ pour entrer le path
+        self.json_path_label = QLabel("Enter JSON rule path")
+
+        # Création du champ pour entrer le path
+        self.json_path_field = QLineEdit()
+
+        # Ajouter les widgets au layout pour le json path
+        layout_json_path.addWidget(self.json_path_label)
+        layout_json_path.addWidget(self.json_path_field)
+
+        # Quand on fait "ENTER" sur le clavier on appelle la fonction qui load le json
+        #self.json_path_field.returnPressed.connect(self.load_json)
+
+        # Ajouter les layouts au layout principal
+        layout.addLayout(layout_json_path)
+
+
+        # Position le widget dans le centre de la main window
+        self.setCentralWidget(widget)
+
+
+
+    #def load_json(self):
+
+
 
 
 
@@ -46,26 +84,21 @@ class MainWindow(QMainWindow):
 
 def main(): 
 
-    global app
+    global ui_window
     try:
-        app.close()
+        ui_window.close()
     except Exception:
         pass
-    # Création de l'application en passant en paramètres les arguments
-    #app = QApplication(sys.argv)
 
     # Création de ma fenêtre principale et appel de son constructeur
-    app = MainWindow()
+    ui_window = MainWindow()
 
     # Afficher la fenêtre principale car elle est caché par défaut
-    app.show()
-
-    # Boucle d'exécution de l'app
-    #sys.exit(app.exec())
+    ui_window.show()
 
 
 # Vérification de si le fichier est en standalone
-#if __name__ == "__main__":
-main()
+if __name__ == "__main__":
+    main()
 
 
