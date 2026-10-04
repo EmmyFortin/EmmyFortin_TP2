@@ -59,11 +59,37 @@ class MainWindow(QMainWindow):
         layout_json_path.addWidget(self.json_path_label)
         layout_json_path.addWidget(self.json_path_field)
 
+
         # Quand on fait "ENTER" sur le clavier on appelle la fonction qui load le json
         #self.json_path_field.returnPressed.connect(self.load_json)
 
+        # Création des widgets checkbox 
+        self.selection_only_checkbox = QCheckBox("Apply on selection only")
+        self.apply_colors_checkbox = QCheckBox("Apply colors")
+        self.apply_reorder_checkbox = QCheckBox("Apply reorder")
+
+        # Layout pour les 3 checkbox
+        layout_checkbox = QVBoxLayout()
+
+        layout_checkbox.addWidget(self.selection_only_checkbox)
+        layout_checkbox.addWidget(self.apply_colors_checkbox)
+        layout_checkbox.addWidget(self.apply_reorder_checkbox)
+
+        # Création du push button qui va call la fonction qui organise l'outliner
+        self.organise_outliner_button = QPushButton("Organise Outliner")
+
+        # Layout du Qpushbutton
+        layout_button = QVBoxLayout()
+        layout_button.addWidget(self.organise_outliner_button)
+
         # Ajouter les layouts au layout principal
         layout.addLayout(layout_json_path)
+        layout.addLayout(layout_checkbox)
+        layout.addLayout(layout_button)
+
+
+
+
 
 
         # Position le widget dans le centre de la main window
@@ -73,11 +99,8 @@ class MainWindow(QMainWindow):
 
     #def load_json(self):
 
-
-
-
-
-
+# fonction qui organise l'outliner 
+    # si checkbox 
 
 
 # Fonction d'exécution principale de l'interface / app
