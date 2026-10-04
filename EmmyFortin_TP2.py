@@ -105,14 +105,31 @@ class MainWindow(QMainWindow):
 
             print(data)
 
+            # Retourne les données chargées pour pouvoir les récupérées dans les fonctions qui compare le json et les objets maya
+            return data
+
         except Exception as error:
             print(f"Could not load data from {json_file}")
             print(error)
 
+    # def get objects : fonction qui récupère les objets sélectionner dans maya si la checkbox selected only est coché sinon on récupere tout
 
 
-# fonction qui organise l'outliner 
-    # si checkbox 
+    # fonctions qui organise l'outliner (apply_colors, apply_order (selection est une condition dans get object))
+        # Parcout les objets dans maya
+        # compare les noms avec les keys du json / trouve ceux qui correspond aux keys dans le json
+        # récupere la couleur qui correspond au json / trie les objets trouvé par ordre alphabetique 
+        # applique la couleur / applique l'ordre
+
+
+    # Fonction qui appelle tout et qui vérifie comment les checkbox sont :
+        # si checkbox selected only : les éléments sélectionner subbissent les changement
+            # si color et selected : on applique la color sur les éléments sélectionnés
+            # si ordre et selected : on applique l'ordre sur les éléments sélectionnés
+            # si ordre couleur et selected : on applique les colors et l'ordre sur les éléments sélectionnés
+        # Si checkbox color : on applique les couleurs surtout
+        # si checkbox ordre alphabetique : on applique l'ordre sur tout
+        # si color et ordre : on applique color et ordre sur tout
 
 
 # Fonction d'exécution principale de l'interface / app
