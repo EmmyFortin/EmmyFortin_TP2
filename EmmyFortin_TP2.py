@@ -59,9 +59,8 @@ class MainWindow(QMainWindow):
         layout_json_path.addWidget(self.json_path_label)
         layout_json_path.addWidget(self.json_path_field)
 
-
         # Quand on fait "ENTER" sur le clavier on appelle la fonction qui load le json
-        #self.json_path_field.returnPressed.connect(self.load_json)
+        self.json_path_field.returnPressed.connect(self.load_json)
 
         # Création des widgets checkbox 
         self.selection_only_checkbox = QCheckBox("Apply on selection only")
@@ -88,16 +87,29 @@ class MainWindow(QMainWindow):
         layout.addLayout(layout_button)
 
 
-
-
-
-
         # Position le widget dans le centre de la main window
         self.setCentralWidget(widget)
 
 
 
-    #def load_json(self):
+    def load_json(self):
+
+        # Récupère le texte entrer dans le champ de texte du chemin du fichier json
+        # Il faut aussi dire d'ignorer les espaces supplémentaires et les ""
+        json_file = self.json_path_field.text().strip().strip('"')
+
+        try: 
+            # Chargement des données du fichier .json entré dans le champ
+            with open(json_file, "r", encoding="utf-8") as file:
+                data = json.load(file)
+
+            print(data)
+
+        except Exception as error:
+            print(f"Could not load data from {json_file}")
+            print(error)
+
+
 
 # fonction qui organise l'outliner 
     # si checkbox 
