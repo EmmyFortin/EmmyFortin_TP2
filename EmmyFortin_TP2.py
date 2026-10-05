@@ -37,7 +37,7 @@ class MainWindow(QMainWindow):
     def create_ui(self):
 
         # Création des widgets de l'interface utilisateur
-        print("UI called")
+
 
         # Création du Widget parent de la main window
         widget = QWidget()
@@ -74,8 +74,11 @@ class MainWindow(QMainWindow):
         layout_checkbox.addWidget(self.apply_colors_checkbox)
         layout_checkbox.addWidget(self.apply_reorder_checkbox)
 
-        # Création du push button qui va call la fonction qui organise l'outliner
+        # Création du push button qui va call la fonction qui applique les changements à l'outliner
         self.organise_outliner_button = QPushButton("Organise Outliner")
+
+        # Appelle la fonction organise_outliner
+        self.organise_outliner_button.clicked.connect(self.organise_outliner)
 
         # Layout du Qpushbutton
         layout_button = QVBoxLayout()
@@ -113,6 +116,22 @@ class MainWindow(QMainWindow):
             print(error)
 
     # def get objects : fonction qui récupère les objets sélectionner dans maya si la checkbox selected only est coché sinon on récupere tout
+    def get_objects(self):
+
+        # Si la case selected only est coché
+        if self.selection_only_checkbox.isChecked():
+            # ls retourne les noms (et les noms des types) d'objets qui sont dans la scène
+            # je ne veux pas avoir les options qui sont dans le haut du outliner (display, show, help)
+            # type = transform car transform représente de façon général les geo, lights, group, particules, cam etc.
+            # je met la séléction à true ici pour juste renvoyé les objets selectionné (car checkbox selected only est coché)
+            objects = cmds.ls(type="transform", selection = True)
+        
+        # Sinon on retourne tout les objets du outliner    
+        else:
+            objects = cmds.ls(type = "transform")
+            
+        print(objects)
+        return objects
 
 
     # fonctions qui organise l'outliner (apply_colors, apply_order (selection est une condition dans get object))
@@ -122,7 +141,9 @@ class MainWindow(QMainWindow):
         # applique la couleur / applique l'ordre
 
 
-    # Fonction qui appelle tout et qui vérifie comment les checkbox sont :
+    # Fonction qui appelle tout (get_objects) et qui vérifie comment les checkbox sont :
+    def organise_outliner(self):
+        self.get_objects()
         # si checkbox selected only : les éléments sélectionner subbissent les changement
             # si color et selected : on applique la color sur les éléments sélectionnés
             # si ordre et selected : on applique l'ordre sur les éléments sélectionnés
