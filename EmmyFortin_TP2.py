@@ -143,14 +143,31 @@ class MainWindow(QMainWindow):
         for object_name in objects:
             print(object_name)
 
-            for key_name in data:
+            # On parcourt les items (paire = key et sa valeur) du JSON
+            # On récupère le nom de la key et sa valeur (la couleur)
+            for key_name, color in data.items():
 
                 # Si les noms des keys du json correspondent aux noms des objets
                 if key_name in object_name:
-                    print(object_name, "est", key_name)
 
+                    # On enable useOutlinerColor dans le attribut editor
+                    cmds.setAttr(object_name + ".useOutlinerColor", True)
 
+                    # On applique la couleur 
+                    # le nom de l'attribut est .outlinerColor
+                    # Color contient la valeur de la couleur correspondant au key_name 
+                    # La couleur est une liste de 3 valeurs (RGB)
+                    # on doit spécifie l'index pour avoir la couleur visuellement 
 
+                    cmds.setAttr(
+                        object_name + ".outlinerColor",
+                        color[0],
+                        color[1],
+                        color[2]
+                    )
+                    print(color)
+
+                    
     def apply_reorder(self, data, objects):
 
         # Parcout les objets dans maya
