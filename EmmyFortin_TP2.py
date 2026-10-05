@@ -106,8 +106,6 @@ class MainWindow(QMainWindow):
             with open(json_file, "r", encoding="utf-8") as file:
                 data = json.load(file)
 
-            print(data)
-
             # Retourne les données chargées pour pouvoir les récupérées dans les fonctions qui compare le json et les objets maya
             return data
 
@@ -130,27 +128,58 @@ class MainWindow(QMainWindow):
         else:
             objects = cmds.ls(type = "transform")
             
-        print(objects)
         return objects
 
 
     # fonctions qui organise l'outliner (apply_colors, apply_order (selection est une condition dans get object))
-        # Parcout les objets dans maya
-        # compare les noms avec les keys du json / trouve ceux qui correspond aux keys dans le json
+        
+
         # récupere la couleur qui correspond au json / trie les objets trouvé par ordre alphabetique 
         # applique la couleur / applique l'ordre
+    
+    def apply_colors(self, data, objects):
+
+        # Parcout les objets dans maya
+        for object_name in objects:
+            print(object_name)
+
+            for key_name in data:
+
+                # Si les noms des keys du json correspondent aux noms des objets
+                if key_name in object_name:
+                    print(object_name, "est", key_name)
+
+
+
+    def apply_reorder(self, data, objects):
+
+        # Parcout les objets dans maya
+        for object_name in objects:
+            print(object_name)
+        
+
 
 
     # Fonction qui appelle tout (get_objects) et qui vérifie comment les checkbox sont :
     def organise_outliner(self):
-        self.get_objects()
-        # si checkbox selected only : les éléments sélectionner subbissent les changement
-            # si color et selected : on applique la color sur les éléments sélectionnés
-            # si ordre et selected : on applique l'ordre sur les éléments sélectionnés
-            # si ordre couleur et selected : on applique les colors et l'ordre sur les éléments sélectionnés
-        # Si checkbox color : on applique les couleurs surtout
-        # si checkbox ordre alphabetique : on applique l'ordre sur tout
-        # si color et ordre : on applique color et ordre sur tout
+
+        # La fonction load_json est appellée
+        # Création d'une variable locale pour stocker les objets du fichier JSON retournés par load_json
+        data = self.load_json()
+
+        # La fonction get_objects est appellée
+        # Création d'une variable locale pour stocker les objets retournés par get_objects
+        objects = self.get_objects()
+
+        # Pour vérifier l'état des checkbox (color et reorder seulement)
+        # Si les deux checkbox sont cochés les deux vont s'appliquer
+        # si color est checked on applique la color sur les éléments sélectionnés
+        if self.apply_colors_checkbox.isChecked():
+            self.apply_colors(data, objects)
+
+        # si ordre est checked on applique l'ordre sur les éléments sélectionnés
+        if self.apply_reorder_checkbox.isChecked():   
+            self.apply_reorder(data, objects)
 
 
 # Fonction d'exécution principale de l'interface / app
