@@ -131,12 +131,7 @@ class MainWindow(QMainWindow):
         return objects
 
 
-    # fonctions qui organise l'outliner (apply_colors, apply_order (selection est une condition dans get object))
-        
-
-        # récupere la couleur qui correspond au json / trie les objets trouvé par ordre alphabetique 
-        # applique la couleur / applique l'ordre
-    
+    # Fonction qui permet d'appliquer la couleur aux objets dans l'outliner
     def apply_colors(self, data, objects):
 
         # Parcout les objets dans maya
@@ -165,30 +160,42 @@ class MainWindow(QMainWindow):
                         color[2]
                     )
 
-                    
+    # Fonction qui permet d'appliquer l'ordre alaphabetique aux objets dans l'outliner           
     def apply_reorder(self, data, objects):
+        print(objects)
 
-        reorder_objects = []
+        # Création d'une liste vide pour contenir les objets à reorder
+        objects_to_reorder = []
 
         # Parcout les objets dans maya
         for object_name in objects:
 
+            # Parcourt les noms des keys dans le fichier JSON
             for key_name in data:
 
+                # Si le nom de la key présentement parcourut est dans le nom de l'objet présentement parcouru
                 if key_name in object_name:
 
-                    reorder_objects.append(object_name)
+                    # On ajoute le nom de l'objet dans la liste d'objets à reorder
+                    objects_to_reorder.append(object_name)
+                    # Correspondance trouvé pour cet objet on arrête de chercher dans les autres key_name
                     break
 
-                    # test = cmds.sortStringArray(object_name, sortOrder= "alphabetic")
-                    # print(test)
-                    #cmds.reorder(test)
+        # Quand get_objects me renvoit la liste sans la séléction à true les objets sont déjà en ordre alphabetique 
+        # Mais quand get_objects me renvoit la liste avec la sélection à true les objets ne sont pas en ordre alphabetique
 
+        # Donc je dois réellement sort avant de reorder
+        # sorted_objects est la liste des objets à reorder en ordre alphabetique
         sorted_objects = cmds.sortStringArray(
-            reorder_objects,
+            objects_to_reorder,
             sortOrder="alphabetic"
         )
-        print(sorted_objects)
+            
+        # Parcourt tout les objets dans la liste d'objets à reorder en orde alphabetique
+        for object_name in sorted_objects:
+
+            # Reorder les objets en ordre alphabetique
+            cmds.reorder(object_name, back=True)
                     
         
 
