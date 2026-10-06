@@ -141,7 +141,6 @@ class MainWindow(QMainWindow):
 
         # Parcout les objets dans maya
         for object_name in objects:
-            print(object_name)
 
             # On parcourt les items (paire = key et sa valeur) du JSON
             # On récupère le nom de la key et sa valeur (la couleur)
@@ -165,14 +164,32 @@ class MainWindow(QMainWindow):
                         color[1],
                         color[2]
                     )
-                    print(color)
 
                     
     def apply_reorder(self, data, objects):
 
+        reorder_objects = []
+
         # Parcout les objets dans maya
         for object_name in objects:
-            print(object_name)
+
+            for key_name in data:
+
+                if key_name in object_name:
+
+                    reorder_objects.append(object_name)
+                    break
+
+                    # test = cmds.sortStringArray(object_name, sortOrder= "alphabetic")
+                    # print(test)
+                    #cmds.reorder(test)
+
+        sorted_objects = cmds.sortStringArray(
+            reorder_objects,
+            sortOrder="alphabetic"
+        )
+        print(sorted_objects)
+                    
         
 
 
