@@ -160,9 +160,11 @@ class MainWindow(QMainWindow):
                         color[2]
                     )
 
-    # Fonction qui permet d'appliquer l'ordre alaphabetique aux objets dans l'outliner           
+    # Fonction qui permet d'appliquer l'ordre alaphabetique aux objets dans l'outliner
+           
     def apply_reorder(self, data, objects):
-        print(objects)
+        
+        
 
         # Création d'une liste vide pour contenir les objets à reorder
         objects_to_reorder = []
@@ -194,34 +196,38 @@ class MainWindow(QMainWindow):
         # Parcourt tout les objets dans la liste d'objets à reorder en orde alphabetique
         for object_name in sorted_objects:
 
-            # Reorder les objets en ordre alphabetique
+            # Reorder les objets en ordre alphabetique mais avec sélection les places dans le bas de la liste
             cmds.reorder(object_name, back=True)
                     
-        
-
-
-
+       
     # Fonction qui appelle tout (get_objects) et qui vérifie comment les checkbox sont :
     def organise_outliner(self):
 
-        # La fonction load_json est appellée
-        # Création d'une variable locale pour stocker les objets du fichier JSON retournés par load_json
-        data = self.load_json()
+        cmds.undoInfo(openChunk=True)
 
-        # La fonction get_objects est appellée
-        # Création d'une variable locale pour stocker les objets retournés par get_objects
-        objects = self.get_objects()
+        # Protection si le programme plante. Il faut fermer le undoInfo car s'il reste ouvert et que sa plante ça peut causer des problèmes
+        try :
+            # La fonction load_json est appellée
+            # Création d'une variable locale pour stocker les objets du fichier JSON retournés par load_json
+            data = self.load_json()
 
-        # Pour vérifier l'état des checkbox (color et reorder seulement)
-        # Si les deux checkbox sont cochés les deux vont s'appliquer
-        # si color est checked on applique la color sur les éléments sélectionnés
-        if self.apply_colors_checkbox.isChecked():
-            self.apply_colors(data, objects)
+            # La fonction get_objects est appellée
+            # Création d'une variable locale pour stocker les objets retournés par get_objects
+            objects = self.get_objects()
 
-        # si ordre est checked on applique l'ordre sur les éléments sélectionnés
-        if self.apply_reorder_checkbox.isChecked():   
-            self.apply_reorder(data, objects)
+            # Pour vérifier l'état des checkbox (color et reorder seulement)
+            # Si les deux checkbox sont cochés les deux vont s'appliquer
+            # si color est checked on applique la color sur les éléments sélectionnés
+            if self.apply_colors_checkbox.isChecked():
+                self.apply_colors(data, objects)
 
+            # si ordre est checked on applique l'ordre sur les éléments sélectionnés
+            if self.apply_reorder_checkbox.isChecked():   
+                self.apply_reorder(data, objects)
+
+        # À la fin peut importe ce qu'il arrive on ferme le closeChunk
+        finally:
+            cmds.undoInfo(closeChunk=True)
 
 # Fonction d'exécution principale de l'interface / app
 
