@@ -121,11 +121,11 @@ class MainWindow(QMainWindow):
             # je ne veux pas avoir les options qui sont dans le haut du outliner (display, show, help)
             # type = transform car transform représente de façon général les geo, lights, group, particules, cam etc.
             # je met la séléction à true ici pour juste renvoyé les objets selectionné (car checkbox selected only est coché)
-            objects = cmds.ls(type="transform", selection = True)
+            objects = cmds.ls(type="transform", selection = True, long = True)
         
         # Sinon on retourne tout les objets du outliner    
         else:
-            objects = cmds.ls(type = "transform")
+            objects = cmds.ls(type = "transform", long = True)
             
         return objects
 
@@ -138,12 +138,13 @@ class MainWindow(QMainWindow):
             # On parcourt les items (paire = key et sa valeur) du JSON
             # On récupère le nom de la key et sa valeur (la couleur)
             for key_name, color in data.items():
-
+                
                 # Si les noms des keys du json correspondent aux noms des objets
                 if key_name in object_name:
 
                     # On enable useOutlinerColor dans le attribut editor
                     cmds.setAttr(object_name + ".useOutlinerColor", True)
+
 
                     # On applique la couleur 
                     # le nom de l'attribut est .outlinerColor
@@ -157,7 +158,6 @@ class MainWindow(QMainWindow):
                         color[1],
                         color[2]
                     )
-                    break
 
     # Fonction qui permet d'appliquer l'ordre alaphabetique aux objets dans l'outliner
            
@@ -169,9 +169,10 @@ class MainWindow(QMainWindow):
         # Parcout les objets dans maya
         for object_name in objects:
 
+            
             # Parcourt les noms des keys dans le fichier JSON
             for key_name in data:
-
+                
                 # Si le nom de la key présentement parcourut est dans le nom de l'objet présentement parcouru
                 if key_name in object_name:
 
@@ -200,31 +201,37 @@ class MainWindow(QMainWindow):
     # Fonction qui appelle tout (get_objects) et qui vérifie comment les checkbox sont :
     def organise_outliner(self):
 
-        cmds.undoInfo(openChunk=True)
+
 
         # Protection si le programme plante. Il faut fermer le undoInfo car s'il reste ouvert et que sa plante ça peut causer des problèmes
-        try :
-            # La fonction load_json est appellée
-            # Création d'une variable locale pour stocker les objets du fichier JSON retournés par load_json
-            data = self.load_json()
+        
+        # La fonction load_json est appellée
+        # Création d'une variable locale pour stocker les objets du fichier JSON retournés par load_json
+        data = self.load_json()
 
-            # La fonction get_objects est appellée
-            # Création d'une variable locale pour stocker les objets retournés par get_objects
-            objects = self.get_objects()
+        if data is None:
+            return
 
-            # Pour vérifier l'état des checkbox (color et reorder seulement)
-            # Si les deux checkbox sont cochés les deux vont s'appliquer
-            # si color est checked on applique la color sur les éléments sélectionnés
-            if self.apply_colors_checkbox.isChecked():
-                self.apply_colors(data, objects)
+        # La fonction get_objects est appellée
+        # Création d'une variable locale pour stocker les objets retournés par get_objects
+        objects = self.get_objects()
 
-            # si ordre est checked on applique l'ordre sur les éléments sélectionnés
-            if self.apply_reorder_checkbox.isChecked():   
-                self.apply_reorder(data, objects)
+        # Pour vérifier l'état des checkbox (color et reorder seulement)
+        # Si les deux checkbox sont cochés les deux vont s'appliquer
+        # si color est checked on applique la color sur les éléments sélectionnés
+        if self.apply_colors_checkbox.isChecked():
+
+            self.apply_colors(data, objects)
+
+
+        # si ordre est checked on applique l'ordre sur les éléments sélectionnés
+        if self.apply_reorder_checkbox.isChecked():
+
+            self.apply_reorder(data, objects)
+
 
         # À la fin peut importe ce qu'il arrive on ferme le closeChunk
-        finally:
-            cmds.undoInfo(closeChunk=True)
+
 
 # Fonction d'exécution principale de l'interface / app
 
@@ -233,6 +240,7 @@ def main():
     global ui_window
     try:
         ui_window.close()
+
     except Exception:
         pass
 
