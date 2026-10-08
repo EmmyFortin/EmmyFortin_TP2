@@ -202,33 +202,36 @@ class MainWindow(QMainWindow):
     # Fonction qui appelle tout (get_objects) et qui vérifie comment les checkbox sont :
     def organise_outliner(self):
 
-
-
-        # Protection si le programme plante. Il faut fermer le undoInfo car s'il reste ouvert et que sa plante ça peut causer des problèmes
-        
         # La fonction load_json est appellée
         # Création d'une variable locale pour stocker les objets du fichier JSON retournés par load_json
         data = self.load_json()
 
         if data is None:
             return
+        cmds.undoInfo(openChunk=True)
 
-        # La fonction get_objects est appellée
-        # Création d'une variable locale pour stocker les objets retournés par get_objects
-        objects = self.get_objects()
+        # Protection si le programme plante. Il faut fermer le undoInfo car s'il reste ouvert et que sa plante ça peut causer des problèmes
+        try:
 
-        # Pour vérifier l'état des checkbox (color et reorder seulement)
-        # Si les deux checkbox sont cochés les deux vont s'appliquer
-        # si color est checked on applique la color sur les éléments sélectionnés
-        if self.apply_colors_checkbox.isChecked():
+            # La fonction get_objects est appellée
+            # Création d'une variable locale pour stocker les objets retournés par get_objects
+            objects = self.get_objects()
 
-            self.apply_colors(data, objects)
+            # si ordre est checked on applique l'ordre sur les éléments sélectionnés
+            if self.apply_reorder_checkbox.isChecked():
 
+                self.apply_reorder(data, objects)
 
-        # si ordre est checked on applique l'ordre sur les éléments sélectionnés
-        if self.apply_reorder_checkbox.isChecked():
+            # Pour vérifier l'état des checkbox (color et reorder seulement)
+            # Si les deux checkbox sont cochés les deux vont s'appliquer
+            # si color est checked on applique la color sur les éléments sélectionnés
+            if self.apply_colors_checkbox.isChecked():
+                self.apply_colors(data, objects)
 
-            self.apply_reorder(data, objects)
+        finally:
+            cmds.undoInfo(closeChunk=True)
+        print("OUTIL TERMINÉ", flush=True)
+
 
 
         # À la fin peut importe ce qu'il arrive on ferme le closeChunk
