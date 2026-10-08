@@ -158,6 +158,7 @@ class MainWindow(QMainWindow):
                         color[1],
                         color[2]
                     )
+                    break
 
     # Fonction qui permet d'appliquer l'ordre alaphabetique aux objets dans l'outliner
            
