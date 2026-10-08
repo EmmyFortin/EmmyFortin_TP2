@@ -38,7 +38,6 @@ class MainWindow(QMainWindow):
 
         # Création des widgets de l'interface utilisateur
 
-
         # Création du Widget parent de la main window
         widget = QWidget()
 
@@ -133,7 +132,6 @@ class MainWindow(QMainWindow):
 
     # Fonction qui permet d'appliquer la couleur aux objets dans l'outliner
     def apply_colors(self, data, objects):
-
         # Parcout les objets dans maya
         for object_name in objects:
 
@@ -159,13 +157,12 @@ class MainWindow(QMainWindow):
                         color[1],
                         color[2]
                     )
+                    break
 
     # Fonction qui permet d'appliquer l'ordre alaphabetique aux objets dans l'outliner
            
     def apply_reorder(self, data, objects):
         
-        
-
         # Création d'une liste vide pour contenir les objets à reorder
         objects_to_reorder = []
 
