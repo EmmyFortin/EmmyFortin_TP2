@@ -1,27 +1,23 @@
-import sys
 import json
 
 import maya.cmds as cmds
 from PySide6.QtWidgets import (
-    QApplication,
     QMainWindow,
     QWidget,
     QMessageBox,
-    QTableWidget,
-    QTableWidgetItem,
     QVBoxLayout,
-    QHBoxLayout,
     QPushButton,
     QLabel,
     QLineEdit,
-    QCheckBox
+    QCheckBox,
 )
 
 
 class MainWindow(QMainWindow):
-    """Class MainWindow qui va contenir l'interface de l'outil."""
+    """Interface du Outliner Organiser."""
 
     def __init__(self):
+        """Initialise la fenêtre principale."""
         super().__init__()
 
         self.setWindowTitle("Outliner Organiser")
@@ -31,7 +27,7 @@ class MainWindow(QMainWindow):
         self.create_ui()
 
     def create_ui(self):
-        """Création des widgets de l'interface utilisateur"""
+        """Crée les widgets et les layouts de l'interface."""
 
         # Création du Widget parent de la main window
         widget = QWidget()
@@ -40,7 +36,7 @@ class MainWindow(QMainWindow):
         # Donne le layout au widget parent
         layout = QVBoxLayout(widget)
 
-        # layout pour champ et label uniquement
+        # Layout pour champ et label uniquement
         layout_json_path = QVBoxLayout()
 
         # Création du label du champ pour entrer le path
@@ -53,10 +49,7 @@ class MainWindow(QMainWindow):
         layout_json_path.addWidget(self.json_path_label)
         layout_json_path.addWidget(self.json_path_field)
 
-        # Quand on fait "ENTER" sur le clavier on appelle la fonction qui load le json
-        self.json_path_field.returnPressed.connect(self.load_json)
-
-        # Création des widgets checkbox 
+        # Création des widgets checkbox
         self.selection_only_checkbox = QCheckBox("Apply on selection only")
         self.apply_colors_checkbox = QCheckBox("Apply colors")
         self.apply_reorder_checkbox = QCheckBox("Apply reorder")
@@ -68,13 +61,13 @@ class MainWindow(QMainWindow):
         layout_checkbox.addWidget(self.apply_colors_checkbox)
         layout_checkbox.addWidget(self.apply_reorder_checkbox)
 
-        # Création du push button qui va call la fonction qui applique les changements à l'outliner
+        # Bouton qui applique les changements à l'outliner
         self.organise_outliner_button = QPushButton("Organise Outliner")
 
         # Appelle la fonction organise_outliner
         self.organise_outliner_button.clicked.connect(self.organise_outliner)
 
-        # Layout du Qpushbutton
+        # Layout du QPushButton
         layout_button = QVBoxLayout()
         layout_button.addWidget(self.organise_outliner_button)
 
@@ -83,50 +76,56 @@ class MainWindow(QMainWindow):
         layout.addLayout(layout_checkbox)
         layout.addLayout(layout_button)
 
-
-        # Position le widget dans le centre de la main window
+        # Positionne le widget dans le centre de la main window
         self.setCentralWidget(widget)
 
-
     def load_json(self):
+        """Charge le contenu du fichier JSON"""
 
-        # Récupère le texte entrer dans le champ de texte du chemin du fichier json
-        # Il faut aussi dire d'ignorer les espaces supplémentaires et les ""
+        # Récupère le texte du chemin du fichier json
+        # Ignorer les espaces supplémentaires et les ""
         json_file = self.json_path_field.text().strip().strip('"')
 
-        try: 
+        try:
             # Chargement des données du fichier .json entré dans le champ
             with open(json_file, "r", encoding="utf-8") as file:
                 data = json.load(file)
 
-            # Retourne les données chargées pour pouvoir les récupérées dans les fonctions qui compare le json et les objets maya
+            # Retourne les données chargées afin de les récupérées
+            # dans les fonctions qui compare le json et les objets maya
             return data
 
+        # S'il y a une erreur on afin un QMessageBox
         except Exception as error:
-            print(f"Could not load data from {json_file}")
-            print(error)
-
+            QMessageBox.critical(
+                self,
+                "Invalid JSON path",
+                f"Could not load data from JSON file :\n{json_file}\n\n{error}",
+            )
+            # On ne poursuit pas les opérations
+            return None
 
     def get_objects(self):
-        """fonction qui récupère les objets sélectionner dans maya si la checkbox selected only est coché sinon on récupere tout"""
+        """Récupère tous les objets ou seulement ceux sélectionnés dans Maya."""
 
-        # Si la case selected only est coché
+        # Si la case selected only est cochée
         if self.selection_only_checkbox.isChecked():
-            # ls retourne les noms (et les noms des types) d'objets qui sont dans la scène
-            # je ne veux pas avoir les options qui sont dans le haut du outliner (display, show, help)
-            # type = transform car transform représente de façon général les geo, lights, group, particules, cam etc.
-            # je met la séléction à true ici pour juste renvoyé les objets selectionné (car checkbox selected only est coché)
-            objects = cmds.ls(type="transform", selection = True)
-        
-        # Sinon on retourne tout les objets du outliner    
+            # ls retourne les noms (et les noms des types) des objets dans la scène
+            # Je veux ne pas les options qui sont dans le haut du outliner (display, show, help)
+            # type = transform
+            # Transform représente de façon général les geo, lights, group, particules, cam etc.
+            # selection = True
+            # Il renvoit les objets selectionnés (car checkbox selected only est coché)
+            objects = cmds.ls(type="transform", selection=True)
+
+        # Sinon on retourne tout les objets du outliner
         else:
-            objects = cmds.ls(type = "transform")
-            
+            objects = cmds.ls(type="transform")
+
         return objects
 
-
     def apply_colors(self, data, objects):
-        """Fonction qui permet d'appliquer la couleur aux objets dans l'outliner"""
+        """Applique la couleur aux objets dans l'outliner selon le JSON."""
 
         # Parcout les objets dans maya
         for object_name in objects:
@@ -134,31 +133,27 @@ class MainWindow(QMainWindow):
             # On parcourt les items (paire = key et sa valeur) du JSON
             # On récupère le nom de la key et sa valeur (la couleur)
             for key_name, color in data.items():
-                
+
                 # Si les noms des keys du json correspondent aux noms des objets
                 if key_name in object_name:
 
-                    # On enable useOutlinerColor dans le attribut editor
+                    # On active useOutlinerColor dans le attribut editor
                     cmds.setAttr(object_name + ".useOutlinerColor", True)
 
-                    # On applique la couleur 
+                    # On applique la couleur
                     # le nom de l'attribut est .outlinerColor
-                    # Color contient la valeur de la couleur correspondant au key_name 
+                    # Color contient la valeur de la couleur correspondant au key_name
                     # La couleur est une liste de 3 valeurs (RGB)
-                    # on doit spécifie l'index pour avoir la couleur visuellement 
+                    # on doit spécifie l'index pour avoir la couleur visuellement
 
                     cmds.setAttr(
-                        object_name + ".outlinerColor",
-                        color[0],
-                        color[1],
-                        color[2]
+                        object_name + ".outlinerColor", color[0], color[1], color[2]
                     )
                     break
 
-           
     def apply_reorder(self, data, objects):
-        """Fonction qui permet d'appliquer l'ordre alaphabetique aux objets dans l'outliner"""
-        
+        """Applique l'ordre alphabétique aux objets dans l'outliner selon le JSON."""
+
         # Création d'une liste vide pour contenir les objets à reorder
         objects_to_reorder = []
 
@@ -167,7 +162,7 @@ class MainWindow(QMainWindow):
 
             # Parcourt les noms des keys dans le fichier JSON
             for key_name in data:
-                
+
                 # Si le nom de la key présentement parcourut est dans le nom de l'objet présentement parcouru
                 if key_name in object_name:
 
@@ -176,33 +171,29 @@ class MainWindow(QMainWindow):
                     # Correspondance trouvé pour cet objet on arrête de chercher dans les autres key_name
                     break
 
-        # Quand get_objects me renvoit la liste sans la séléction à true les objets sont déjà en ordre alphabetique 
-        # Mais quand get_objects me renvoit la liste avec la sélection à true les objets ne sont pas en ordre alphabetique
+        # Avec la sélection, on n'a pas l'ordre alphabétique.
 
-        # Donc je dois réellement sort avant de reorder
+        # Il faut trier les objets avant de les réorganiser dans Maya
         # sorted_objects est la liste des objets à reorder en ordre alphabetique
         sorted_objects = cmds.sortStringArray(
-            objects_to_reorder,
-            sortOrder="alphabetic"
+            objects_to_reorder, sortOrder="alphabetic"
         )
-            
+
         # Parcourt tout les objets dans la liste d'objets à reorder en orde alphabetique
         for object_name in sorted_objects:
-
-            # Reorder les objets en ordre alphabetique mais avec sélection les places dans le bas de la liste
+            # Reorder les objets en ordre alphabetique
+            # Ils sont placés dans le bas de la liste
             cmds.reorder(object_name, back=True)
-                    
-       
+
     def organise_outliner(self):
-        """Fonction qui appelle tout (get_objects) et qui vérifie comment les checkbox sont."""
+        """Exécute les opérations sélectionnées et gère les Undo."""
 
         # Si aucune option est choisie, on affiche un message d'avertissement
-        if not self.apply_colors_checkbox.isChecked() and not self.apply_reorder_checkbox.isChecked():
-            QMessageBox.warning(
-                self,
-                "WARNING",
-                "Please select one operation"
-            )
+        if (
+            not self.apply_colors_checkbox.isChecked()
+            and not self.apply_reorder_checkbox.isChecked()
+        ):
+            QMessageBox.warning(self, "WARNING", "Please select one operation")
             return
 
         # La fonction load_json est appellée
@@ -211,9 +202,10 @@ class MainWindow(QMainWindow):
 
         if data is None:
             return
-        
+
+        # Mets les modifications dans un même Undo
         cmds.undoInfo(openChunk=True, chunkName="Organise Outliner")
-        
+
         # Protection si le programme plante. Il faut fermer le undoInfo car s'il reste ouvert et que sa plante ça peut causer des problèmes
         try:
 
@@ -221,22 +213,21 @@ class MainWindow(QMainWindow):
             # Création d'une variable locale pour stocker les objets retournés par get_objects
             objects = self.get_objects()
 
-            # si ordre est checked on applique l'ordre sur les éléments sélectionnés
+            # Si ordrer est checked on applique l'ordre sur les éléments sélectionnés
             if self.apply_reorder_checkbox.isChecked():
-
                 self.apply_reorder(data, objects)
 
-            # Pour vérifier l'état des checkbox (color et reorder seulement)
-            # Si les deux checkbox sont cochés les deux vont s'appliquer
-            # si color est checked on applique la color sur les éléments sélectionnés
+            # Si color est checked on applique la color sur les éléments sélectionnés
             if self.apply_colors_checkbox.isChecked():
                 self.apply_colors(data, objects)
 
+        # À la fin peut importe ce qu'il arrive on ferme le closeChunk
         finally:
             cmds.undoInfo(closeChunk=True)
 
         cmds.outlinerEditor("outlinerPanel1", edit=True, refresh=True)
 
+        # QMessageBox pour dire que l'opération est terminée
         message_done = QMessageBox(self)
         message_done.setIcon(QMessageBox.Information)
         message_done.setWindowTitle("Operation Done")
@@ -244,12 +235,9 @@ class MainWindow(QMainWindow):
         message_done.addButton("Done", QMessageBox.AcceptRole)
         message_done.exec()
 
-        # À la fin peut importe ce qu'il arrive on ferme le closeChunk
 
-
-# Fonction d'exécution principale de l'interface / app
-
-def main(): 
+def main():
+    """Fonction d'exécution principale de l'interface"""
 
     global ui_window
     try:
@@ -264,8 +252,7 @@ def main():
     # Afficher la fenêtre principale car elle est caché par défaut
     ui_window.show()
 
-# Vérification de si le fichier est en standalone
+
+# Vérifie si le ficher est standalone
 if __name__ == "__main__":
     main()
-
-
