@@ -141,6 +141,8 @@ class MainWindow(QMainWindow):
                 
                 # Si les noms des keys du json correspondent aux noms des objets
                 if key_name in object_name:
+
+                    # Permet de refresh le outliner sans avoir a aller mettre la souris dedans
                     cmds.outlinerEditor("outlinerPanel1",edit=True, refresh=True)
 
                     # On enable useOutlinerColor dans le attribut editor
@@ -211,7 +213,9 @@ class MainWindow(QMainWindow):
 
         if data is None:
             return
-        cmds.undoInfo(openChunk=True)
+        
+        cmds.undoInfo(openChunk=True, chunkName="Organise Outliner")
+        
 
         # Protection si le programme plante. Il faut fermer le undoInfo car s'il reste ouvert et que sa plante ça peut causer des problèmes
         try:
@@ -233,7 +237,15 @@ class MainWindow(QMainWindow):
 
         finally:
             cmds.undoInfo(closeChunk=True)
-        print("OUTIL TERMINÉ", flush=True)
+
+        cmds.outlinerEditor("outlinerPanel1", edit=True, refresh=True)
+
+        message_done = QMessageBox(self)
+        message_done.setIcon(QMessageBox.Information)
+        message_done.setWindowTitle("Operation Done")
+        message_done.setText(f"Organisation completed")
+        message_done.addButton("Done", QMessageBox.AcceptRole)
+        message_done.exec()
 
 
 
@@ -256,6 +268,7 @@ def main():
 
     # Afficher la fenêtre principale car elle est caché par défaut
     ui_window.show()
+
 
 
 # Vérification de si le fichier est en standalone
