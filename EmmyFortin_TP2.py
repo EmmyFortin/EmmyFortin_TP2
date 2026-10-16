@@ -18,12 +18,8 @@ from PySide6.QtWidgets import (
 )
 
 
-#----------------------------------------- 1 Création de l'interface du Outliner Organiser
-
-# Class MainWindow qui va contenir l'interface de l'outil
-
 class MainWindow(QMainWindow):
-
+    """Class MainWindow qui va contenir l'interface de l'outil."""
 
     def __init__(self):
         super().__init__()
@@ -35,8 +31,7 @@ class MainWindow(QMainWindow):
         self.create_ui()
 
     def create_ui(self):
-
-        # Création des widgets de l'interface utilisateur
+        """Création des widgets de l'interface utilisateur"""
 
         # Création du Widget parent de la main window
         widget = QWidget()
@@ -93,7 +88,6 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(widget)
 
 
-
     def load_json(self):
 
         # Récupère le texte entrer dans le champ de texte du chemin du fichier json
@@ -113,8 +107,8 @@ class MainWindow(QMainWindow):
             print(error)
 
 
-    # def get objects : fonction qui récupère les objets sélectionner dans maya si la checkbox selected only est coché sinon on récupere tout
     def get_objects(self):
+        """fonction qui récupère les objets sélectionner dans maya si la checkbox selected only est coché sinon on récupere tout"""
 
         # Si la case selected only est coché
         if self.selection_only_checkbox.isChecked():
@@ -131,8 +125,8 @@ class MainWindow(QMainWindow):
         return objects
 
 
-    # Fonction qui permet d'appliquer la couleur aux objets dans l'outliner
     def apply_colors(self, data, objects):
+        """Fonction qui permet d'appliquer la couleur aux objets dans l'outliner"""
 
         # Parcout les objets dans maya
         for object_name in objects:
@@ -160,11 +154,10 @@ class MainWindow(QMainWindow):
                         color[2]
                     )
                     break
-            
 
-    # Fonction qui permet d'appliquer l'ordre alaphabetique aux objets dans l'outliner
            
     def apply_reorder(self, data, objects):
+        """Fonction qui permet d'appliquer l'ordre alaphabetique aux objets dans l'outliner"""
         
         # Création d'une liste vide pour contenir les objets à reorder
         objects_to_reorder = []
@@ -172,7 +165,6 @@ class MainWindow(QMainWindow):
         # Parcout les objets dans maya
         for object_name in objects:
 
-            
             # Parcourt les noms des keys dans le fichier JSON
             for key_name in data:
                 
@@ -201,8 +193,17 @@ class MainWindow(QMainWindow):
             cmds.reorder(object_name, back=True)
                     
        
-    # Fonction qui appelle tout (get_objects) et qui vérifie comment les checkbox sont :
     def organise_outliner(self):
+        """Fonction qui appelle tout (get_objects) et qui vérifie comment les checkbox sont."""
+
+        # Si aucune option est choisie, on affiche un message d'avertissement
+        if not self.apply_colors_checkbox.isChecked() and not self.apply_reorder_checkbox.isChecked():
+            QMessageBox.warning(
+                self,
+                "WARNING",
+                "Please select one operation"
+            )
+            return
 
         # La fonction load_json est appellée
         # Création d'une variable locale pour stocker les objets du fichier JSON retournés par load_json
@@ -210,12 +211,9 @@ class MainWindow(QMainWindow):
 
         if data is None:
             return
-
-
         
         cmds.undoInfo(openChunk=True, chunkName="Organise Outliner")
         
-
         # Protection si le programme plante. Il faut fermer le undoInfo car s'il reste ouvert et que sa plante ça peut causer des problèmes
         try:
 
@@ -246,8 +244,6 @@ class MainWindow(QMainWindow):
         message_done.addButton("Done", QMessageBox.AcceptRole)
         message_done.exec()
 
-
-
         # À la fin peut importe ce qu'il arrive on ferme le closeChunk
 
 
@@ -267,10 +263,6 @@ def main():
 
     # Afficher la fenêtre principale car elle est caché par défaut
     ui_window.show()
-
-    #cmds.refresh(force=True)
-
-
 
 # Vérification de si le fichier est en standalone
 if __name__ == "__main__":
