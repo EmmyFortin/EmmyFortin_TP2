@@ -121,11 +121,11 @@ class MainWindow(QMainWindow):
             # je ne veux pas avoir les options qui sont dans le haut du outliner (display, show, help)
             # type = transform car transform représente de façon général les geo, lights, group, particules, cam etc.
             # je met la séléction à true ici pour juste renvoyé les objets selectionné (car checkbox selected only est coché)
-            objects = cmds.ls(type="transform", selection = True, long = True)
+            objects = cmds.ls(type="transform", selection = True)
         
         # Sinon on retourne tout les objets du outliner    
         else:
-            objects = cmds.ls(type = "transform", long = True)
+            objects = cmds.ls(type = "transform")
             
         return objects
 
@@ -141,6 +141,7 @@ class MainWindow(QMainWindow):
                 
                 # Si les noms des keys du json correspondent aux noms des objets
                 if key_name in object_name:
+                    cmds.outlinerEditor("outlinerPanel1",edit=True, refresh=True)
 
                     # On enable useOutlinerColor dans le attribut editor
                     cmds.setAttr(object_name + ".useOutlinerColor", True)
@@ -159,6 +160,8 @@ class MainWindow(QMainWindow):
                         color[2]
                     )
                     break
+
+                    
 
     # Fonction qui permet d'appliquer l'ordre alaphabetique aux objets dans l'outliner
            
