@@ -112,6 +112,7 @@ class MainWindow(QMainWindow):
             print(f"Could not load data from {json_file}")
             print(error)
 
+
     # def get objects : fonction qui récupère les objets sélectionner dans maya si la checkbox selected only est coché sinon on récupere tout
     def get_objects(self):
 
@@ -132,6 +133,7 @@ class MainWindow(QMainWindow):
 
     # Fonction qui permet d'appliquer la couleur aux objets dans l'outliner
     def apply_colors(self, data, objects):
+
         # Parcout les objets dans maya
         for object_name in objects:
 
@@ -142,12 +144,8 @@ class MainWindow(QMainWindow):
                 # Si les noms des keys du json correspondent aux noms des objets
                 if key_name in object_name:
 
-                    # Permet de refresh le outliner sans avoir a aller mettre la souris dedans
-                    cmds.outlinerEditor("outlinerPanel1",edit=True, refresh=True)
-
                     # On enable useOutlinerColor dans le attribut editor
                     cmds.setAttr(object_name + ".useOutlinerColor", True)
-
 
                     # On applique la couleur 
                     # le nom de l'attribut est .outlinerColor
@@ -162,8 +160,7 @@ class MainWindow(QMainWindow):
                         color[2]
                     )
                     break
-
-                    
+            
 
     # Fonction qui permet d'appliquer l'ordre alaphabetique aux objets dans l'outliner
            
@@ -213,6 +210,8 @@ class MainWindow(QMainWindow):
 
         if data is None:
             return
+
+
         
         cmds.undoInfo(openChunk=True, chunkName="Organise Outliner")
         
@@ -268,6 +267,8 @@ def main():
 
     # Afficher la fenêtre principale car elle est caché par défaut
     ui_window.show()
+
+    #cmds.refresh(force=True)
 
 
 
